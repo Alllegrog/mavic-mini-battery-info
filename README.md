@@ -1,13 +1,10 @@
 # DJI Mavic Mini Battery Info
 
+As the Mavic Mini battery lacks a charge level indicator, this device queries the I2C smart battery chip and allows you to check charge level, battery status, and other information.
 
-Because Mavic Mini battery has not charge level indicator (like other DJI batteries) with this device you are able to quickly check Mavic Mini battery status, level of charge and other informations.
-It reads I2C smart battery chip and report its values. All values are also printed to USB serial line.
+This fork has been modified to use an ESP8266 (Wemos D1 Mini) instead of an Arduino Nano.  The Nano is easier to implement, as it can operate natively at the power levels delivered by the battery.
 
-![screenshot](https://czipis.eu/images/battery-info-screenshot.jpg)
-
-
-serial line report example
+Serial output example:
 ```
 Manufacturer Name: SDI
 Device Name: BA01WM160
@@ -36,76 +33,55 @@ Temp: 23.75
 Current (mA): -131
 ```
 
-[![Watch the video](https://czipis.eu/images/youtube.png)](https://www.youtube.com/watch?v=iwm-ErN7L9Y)
+### Required Parts
 
-### required parts
-all parts can be purchased on Aliexpress for less than $6
+- Wemos D1 Mini R2
+- [1.8" 128x160 SPI LCD Display Module ST7735](https://www.aliexpress.com/item/33031122936.html)
+- L7805 Voltage Regulator, or similar
+- 1x 0.33uF and 1x 0.1uF capacitors - Note: I used 0.22uF and 0.1uF.
 
-- [Breadboard Jumper wires Cables](https://www.aliexpress.com/item/32725034190.html)
-- [1.8" 128x160 65K SPI LCD Display Module ST7735](https://www.aliexpress.com/item/33031122936.html)
-- [Arduino Nano ATMEGA328P Mini USB (Nano3 compatible)](https://www.aliexpress.com/item/33013146682.html)
+### 3D Printed Case
+- [3D printed case (Updated, OpenSCAD parametrized... mostly)](https://www.thingiverse.com/thing:4602325)
+- The case has a cutout that fits a JST PHR-6 connector and header.  The header pins slot into the Mavic Mini battery. 
 
-### custom 3D printed case
-- [3D printed custom case (Openscad parametrized)](https://www.thingiverse.com/thing:4430174)
-
-
-### pin connections
-![Wiring](./breadboard.png)
-
+### Pin Connections
  
-| Arduino NANO    |  SPI  TFT  |   Mavic Mini battery    |
-|-----------------|:----------:|:-----------------------:|
-|VIN              |            |            3            |
-|GND              |     GND    |            5            |
-|5V               |     VDD    |                         | 
-|3.3V             |     BLK    |                         |
-|A4               |            |            6            |
-|A5               |            |            1            |
-|D7               |     RST    |                         |
-|D8               |     DC     |                         |
-|D9               |     CS     |                         |
-|ICSP3            |     SCL    |                         | 
-|ICSP4            |     SDA    |                         |
+| Wemos D1 Mini | GPIO PIN  | SPI  TFT | Battery |
+|:-------------:|:---------:|:--------:|:-------:|
+|    5V         |           |          |    3    |
+|    GND        |           |   GND    |    5    |
+|    D4         |   GPIO2   |   RES    |         | 
+|    D2         |   GPIO4   |          |    6    |
+|    D1         |   GPIO5   |          |    1    |
+|    3.3v       |           |   VCC    |         |
+|    D8         |   GPIO15  |   DC     |         |
+|    D7         |   GPIO13  |   SDA    |         |
+|    D5         |   GPIO14  |   SCL    |         |
+|    D0         |   GPIO16  |   CS     |         | 
 
-## compiling
+The L7805 Voltage Regulator sits between the battery and the 5V pin on the Wemos. 
 
-### required libraries
+![Wiring](./wiring-diagram.png)
 
-#### following TFT library needs to be installed from .ZIP archvive
+## Compiling
 
-- download [zip](https://github.com/Bodmer/TFT_ST7735/archive/master.zip) and install in Arduino IDE (Sketch -> Include library -> Add .ZIP library)
-- [Bodmer TFT_ST7735 v0.17](https://github.com/Bodmer/TFT_ST7735)
+### Required Libraries
+- (Tools -> Manage Libraries...)
+- [Bodmer TFT_eSPI](https://github.com/Bodmer/TFT_eSPI)
 
-#### dependencies which can be installed from Arduino IDE
-- (Sketch -> Include library -> Manage libraries...)
-- [Adafruit_GFX_Library v1.8.3](https://github.com/adafruit/Adafruit-GFX-Library)
-- [Adafruit_BusIO v1.3.0](https://github.com/adafruit/Adafruit_BusIO)
-
-#### modify TFT_ST7735 library to fit in Nano flash memory
-
-modify ${HOME}/Arduino/libraries/TFT_ST7735/User_Setup.h
-
-uncomment following lines at top of the file
-
-``` #define TAB_COLOUR INITR_BLACKTAB ```
-
-comment any other TAB_COLOUR line, it should look like
-
+### Modify TFT_eSPI for your display
+${USER}/Documents/Arduino/libraries/TFT_eSPI/User_Setup_Select.h
+Change the following lines to be as shown:
 ```
-//#define TAB_COLOUR INITB
-//#define TAB_COLOUR INITR_GREENTAB
-//#define TAB_COLOUR INITR_REDTAB
-#define TAB_COLOUR INITR_BLACKTAB
-//#define TAB_COLOUR INITR_GREENTAB
+//#include <User_Setup.h>
+#include <User_Setups/Setup2_ST7735.h>   // Setup file configured for my ST7735
 ```
 
-comment out all fonts except Font 1 and Font 2 (otherwise it will not fit in Nano flash memory)
-
+${USER}/Documents/Arduino/libraries/TFT_eSPI/User_Setups/Setup2_ST7735.h
+Change the following lines to be as shown:
 ```
-#define LOAD_GLCD   // Font 1. Original Adafruit 8 pixel font needs ~1820 bytes in FLASH
-#define LOAD_FONT2  // Font 2. Small 16 pixel high font, needs ~3534 bytes in FLASH, 96 characters
-//#define LOAD_FONT4  // Font 4. Medium 26 pixel high font, needs ~5848 bytes in FLASH, 96 characters
-//#define LOAD_FONT6  // Font 6. Large 48 pixel font, needs ~2666 bytes in FLASH, only characters 1234567890:-.apm
-//#define LOAD_FONT7  // Font 7. 7 segment 48 pixel font, needs ~2438 bytes in FLASH, only characters 1234567890:.
-//#define LOAD_FONT8  // Font 8. Large 75 pixel font needs ~3256 bytes in FLASH, only characters 1234567890:-.
+#define ST7735_GREENTAB
+
+#define TFT_CS   16  // Chip select control pin D8
+#define TFT_DC   15  // Data Command control pin
 ```
