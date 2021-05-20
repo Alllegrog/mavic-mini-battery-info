@@ -2,7 +2,7 @@
 
 As the Mavic Mini battery lacks a charge level indicator, this device queries the I2C smart battery chip and allows you to check charge level, battery status, and other information.
 
-This fork has been modified to use an ESP8266 (Wemos D1 Mini) instead of an Arduino Nano.  The Nano is easier to implement, as it can operate natively at the power levels delivered by the battery.
+This fork has been modified to use an ESP8266 (Wemos/Lolin D1 Mini) instead of an Arduino Nano.  The Nano is easier to implement, as it can operate natively at the power levels delivered by the battery.
 
 Serial output example:
 ```
@@ -35,7 +35,7 @@ Current (mA): -131
 
 ### Required Parts
 
-- Wemos D1 Mini (I used [this](https://www.aliexpress.com/item/32529101036.html?spm=a2g0o.store_pc_home.productList_2559240.pic_1))
+- Wemos/Lolin D1 Mini (I used [this](https://www.aliexpress.com/item/32529101036.html?spm=a2g0o.store_pc_home.productList_2559240.pic_1))
 - [1.8" 128x160 SPI LCD Display Module ST7735](https://www.aliexpress.com/item/33031122936.html)
 - L7805 Voltage Regulator, or similar
 - 1x 0.33uF and 1x 0.1uF capacitors - Note: I used 0.22uF and 0.1uF
