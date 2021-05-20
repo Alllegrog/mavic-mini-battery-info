@@ -35,10 +35,10 @@ Current (mA): -131
 
 ### Required Parts
 
-- Wemos D1 Mini R2
+- Wemos D1 Mini (I used [this](https://www.aliexpress.com/item/32529101036.html?spm=a2g0o.store_pc_home.productList_2559240.pic_1))
 - [1.8" 128x160 SPI LCD Display Module ST7735](https://www.aliexpress.com/item/33031122936.html)
 - L7805 Voltage Regulator, or similar
-- 1x 0.33uF and 1x 0.1uF capacitors - Note: I used 0.22uF and 0.1uF.
+- 1x 0.33uF and 1x 0.1uF capacitors - Note: I used 0.22uF and 0.1uF
 
 ### 3D Printed Case
 - [3D printed case (Updated, OpenSCAD parametrized... mostly)](https://www.thingiverse.com/thing:4602325)
